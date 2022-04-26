@@ -51,10 +51,12 @@ def clean_data(gt_anno, dt_anno, current_class, difficulty):
         else:
             valid_class = -1
         ignore = False
-        if ((gt_anno['occluded'][i] > MAX_OCCLUSION[difficulty])
-                or (gt_anno['truncated'][i] > MAX_TRUNCATION[difficulty])
-                or (height <= MIN_HEIGHT[difficulty])):
-            ignore = True
+        # !!! DEBUG
+        # if ((gt_anno['occluded'][i] > MAX_OCCLUSION[difficulty])
+        #         or (gt_anno['truncated'][i] > MAX_TRUNCATION[difficulty])
+        #         or (height <= MIN_HEIGHT[difficulty])):
+        #     ignore = True
+        # print(valid_class, ignore)
         if valid_class == 1 and not ignore:
             ignored_gt.append(0)
             num_valid_gt += 1
@@ -72,7 +74,9 @@ def clean_data(gt_anno, dt_anno, current_class, difficulty):
             valid_class = -1
         height = abs(dt_anno['bbox'][i, 3] - dt_anno['bbox'][i, 1])
         if height < MIN_HEIGHT[difficulty]:
-            ignored_dt.append(1)
+            # !!! DEBUG
+            # ignored_dt.append(1)
+            ignored_dt.append(0)
         elif valid_class == 1:
             ignored_dt.append(0)
         else:
@@ -493,6 +497,9 @@ def eval_class(gt_annos,
             rets = _prepare_data(gt_annos, dt_annos, current_class, difficulty)
             (gt_datas_list, dt_datas_list, ignored_gts, ignored_dets,
              dontcares, total_dc_num, total_num_valid_gt) = rets
+            # print("ignored_gts", ignored_gts)
+            # print("ignored_dets", ignored_dets)
+            # print("dontcares", dontcares)
             for k, min_overlap in enumerate(min_overlaps[:, metric, m]):
                 thresholdss = []
                 for i in range(len(gt_annos)):
@@ -690,15 +697,16 @@ def kitti_eval(gt_annos,
     compute_aos = False
     pred_alpha = False
     valid_alpha_gt = False
-    for anno in dt_annos:
-        mask = (anno['alpha'] != -10)
-        if anno['alpha'][mask].shape[0] != 0:
-            pred_alpha = True
-            break
-    for anno in gt_annos:
-        if anno['alpha'][0] != -10:
-            valid_alpha_gt = True
-            break
+    # !!! DEBUG
+    # for anno in dt_annos:
+    #     mask = (anno['alpha'] != -10)
+    #     if anno['alpha'][mask].shape[0] != 0:
+    #         pred_alpha = True
+    #         break
+    # for anno in gt_annos:
+    #     if anno['alpha'][0] != -10:
+    #         valid_alpha_gt = True
+    #         break
     compute_aos = (pred_alpha and valid_alpha_gt)
     if compute_aos:
         eval_types.append('aos')

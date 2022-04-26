@@ -7,6 +7,14 @@ from tools.data_converter import kitti_converter as kitti
 from tools.data_converter import lyft_converter as lyft_converter
 from tools.data_converter import nuscenes_converter as nuscenes_converter
 from tools.data_converter.create_gt_database import create_groundtruth_database
+from tools.data_converter import opv2v_converter as opv2v
+
+
+def opv2v_data_prep(root_path, out_dir):
+    info_prefix = "opv2v"
+    opv2v.create_opv2v_info_file(root_path, info_prefix)
+    create_groundtruth_database('OPV2VDataset', root_path, info_prefix,
+                                f'{out_dir}/{info_prefix}_infos_train.pkl')
 
 
 def kitti_data_prep(root_path, info_prefix, version, out_dir):
@@ -188,7 +196,8 @@ parser.add_argument('dataset', metavar='kitti', help='name of the dataset')
 parser.add_argument(
     '--root-path',
     type=str,
-    default='./data/kitti',
+    default='./data/opv2v',
+    required=False,
     help='specify the root path of dataset')
 parser.add_argument(
     '--version',
@@ -205,8 +214,8 @@ parser.add_argument(
 parser.add_argument(
     '--out-dir',
     type=str,
-    default='./data/kitti',
-    required='False',
+    default='./data/opv2v',
+    required=False,
     help='name of info pkl')
 parser.add_argument('--extra-tag', type=str, default='kitti')
 parser.add_argument(
@@ -285,3 +294,7 @@ if __name__ == '__main__':
             info_prefix=args.extra_tag,
             out_dir=args.out_dir,
             workers=args.workers)
+    elif args.dataset == 'opv2v':
+        opv2v_data_prep(
+            root_path=args.root_path,
+            out_dir=args.out_dir)
